@@ -1,87 +1,71 @@
-// Слой модели
+//Модели данных: Товар, Пользователь, Корзина.
 
-// Модель продукта
-export interface IProduct {
-	id: string
-	description: string
-	image: string
-	title: string
-	category: string
-	price: number
+// Интерфейс для товара (Item)
+
+export interface IItem {
+    id: string;
+    title: string;              
+    image: string;
+    price: number;
+    category: string;          
+    description: string;
 }
 
-// Модель информации о пользователе заказа
-export interface IUserInfo {
-	payment: PaymentType
-	email: string
-	phone: string
-	address: string
+// Интерфейс для пользователя (User)
+
+export interface IUser {
+    id: string;       
+    email: string;
+    phone: string;
 }
 
-// Модель информации о содержимом заказа
-export interface IOrderInfo {
-	total: number
-	items: string[]
-}
+// Интерфейс для корзины (Basket)
 
-// Модель заказа
-type Order = IUserInfo | IOrderInfo;
-
-// Модель типа платежа
-export type PaymentType = 'Онлайн' | 'При получении'
-
-// Сервис по работе с заказами
-export interface IOrderService {
-	processPayment(order: Order): void
-}
-
-// Сервис по работе с корзиной
 export interface IBasket {
-	getItems(): string[]
-	add(id: string): void
-	remove(id: string): void
-	clear(): void
-	getTotalSum(): number
+    items: IItem[];            
+    total: number;             
+    paymentMethod: string;
+    shippingAddress: string;  
+    buyerId: string; 
+    statusOrder: string;      
 }
 
+// Интерфейс отображений Views
 
-
-// Слой Presentation (типы находятся в файле events.ts)
-
-
-// Слой View
-
-// Базовый интерфейс для любой view
-export interface IView<T> {
-	render(data?: T): HTMLElement
+export interface IMainPageView {
+    renderItems(items: IItem[]): void;    // Отображение списка товаров
+    showError(message: string): void;
+}
+export interface ItemCardView {
+    render(item: IItem): void;   // Отображение конкретной карточки товара
+    onAddToBasketClick(item: IItem): void;
+}
+export interface ItemModalView {
+    render(item: IItem): void;   // Отображение информации о товаре в модальном окне
+    onAddToBasketClick(item: IItem): void;
+    closeModal(): void;   
+}
+export interface BasketModalView {
+    renderBasket(basket: IBasket): void;   // Отображение содержимого корзины
+    onRemoveItemClick(item: IItem): void;
+    closeModal(): void;
+}
+export interface PaymentModalView {
+    renderPaymentForm(basket: IBasket): void;   // Отображение формы оплаты заказа
+    onPaymentSubmit(paymentDetails: { paymentMethod: string, shippingAddress: string }): void;  
+    showError(message: string): void;
+}
+export interface ContactsModalView {
+    renderContactForm(user: IUser): void;   // Отображение формы ввода контактных данных
+    onSubmitContactForm(user: IUser): void;
+}
+export interface SuccessOrderModalView {
+    renderSuccessMessage(): void;  // Модальное окно, которое отображается после успешного завершения заказа
 }
 
-// Базовый интерфейс модального окна
-export interface IModal<T> extends IView<T> {
-	open(): void
-	close(): void
+export interface IOrderData {
+    email?: string,
+    phone?: string,
+    payment?: string,
+    address?: string
 }
-
-// View для отображения списка продуктов
-export interface IProductListView extends IView<IProduct[]> {
-	openProduct(id: string): void
-}
-
-// Модальное окно для отображения одного продукта
-export interface IProductModalView extends IModal<IProduct> {
-	addProductToBasket(id: string): void
-}
-
-// Модальное окно для оформления заказа для отображения формы заказа, пока undefined, наверное неверно
-export interface IOrderForm extends IModal<undefined> {
-	processOrder(): void;
-}
-
-
-// Модальное окно для отображения корзины
-export interface IBasketView extends IModal<string[]> {
-	startToProcessOrder(): void
-	deleteItem(id: string): void
-}
-
-
